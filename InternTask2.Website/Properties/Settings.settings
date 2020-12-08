@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="InternTask2.Website.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="AppEmail" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">interntask1@inbox.ru</Value>
+    </Setting>
+    <Setting Name="AppEmailPass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">G3dS[pyaaJD3</Value>
+    </Setting>
+    <Setting Name="SPLogin" Type="System.String" Scope="Application">
+      <Value Profile="(Default)"></Value>
+    </Setting>
+    <Setting Name="SPPass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)"></Value>
+    </Setting>
+    <Setting Name="SPSiteUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)"></Value>
+    </Setting>
+    <Setting Name="SPDocLibName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DocumentLibraryIT2</Value>
+    </Setting>
+    <Setting Name="SPListName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">RegistrationsIT2</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

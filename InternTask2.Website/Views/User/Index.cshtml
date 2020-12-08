@@ -1,0 +1,42 @@
+﻿@using InternTask2.Website.Helpers
+@model InternTask2.Website.Models.DocumentsViewModel
+
+@{
+    ViewBag.Title = "Documents";
+}
+
+<h2>Documents</h2>
+
+<p>
+    @Html.ActionLink("Upload file", "Upload")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Name")
+        </th>
+        <th>
+            @Html.DisplayName("Modified")
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Documents)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @item.Modified.ToLocalTime()
+            </td>
+            <td>
+                @Html.ActionLink("Download", "Download", new { id = item.Id })
+            </td>
+        </tr>
+    }
+</table>
+<hr />
+<div class="btn-group">
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { page = x }))
+</div>

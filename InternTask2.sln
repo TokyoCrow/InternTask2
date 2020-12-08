@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InternTask2.Website", "InternTask2.Website\InternTask2.Website.csproj", "{0D826D95-5090-454F-81FA-CC1A6103BCEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InternTask2.ConsoleApp", "InternTask2.Console\InternTask2.ConsoleApp.csproj", "{F2C360EA-BE86-40EA-A6E4-6976111F7729}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D826D95-5090-454F-81FA-CC1A6103BCEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D826D95-5090-454F-81FA-CC1A6103BCEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D826D95-5090-454F-81FA-CC1A6103BCEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D826D95-5090-454F-81FA-CC1A6103BCEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C360EA-BE86-40EA-A6E4-6976111F7729}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C360EA-BE86-40EA-A6E4-6976111F7729}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C360EA-BE86-40EA-A6E4-6976111F7729}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C360EA-BE86-40EA-A6E4-6976111F7729}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C57A9FAB-234A-4EDF-B64E-60C5CAF93A22}
+	EndGlobalSection
+EndGlobal

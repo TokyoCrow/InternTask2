@@ -1,0 +1,8 @@
+﻿@using InternTask2.Website.Helpers
+@model InternTask2.Website.Models.UsersViewModel
+
+@Html.Partial("_ViewUsersList", Model.Users)
+
+<div class="btn-group">
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("Registrations", new { page = x }))
+</div>

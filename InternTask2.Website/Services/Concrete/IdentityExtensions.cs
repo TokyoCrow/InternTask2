@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace InternTask2.Website.Models
+namespace InternTask2.Website.Services.Concrete
 {
     public static class IdentityExtensions
     {

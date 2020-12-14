@@ -1,10 +1,11 @@
-﻿using InternTask2.Website.Properties;
+﻿using InternTask2.Website.Models;
+using InternTask2.Website.Properties;
 using Microsoft.SharePoint.Client;
 using System;
-using System.Net;
 using System.Security;
+using User = InternTask2.Website.Models.User;
 
-namespace InternTask2.Website.Models
+namespace InternTask2.Website.Helpers
 {
     public static class SharePointManager
     {

@@ -194,7 +194,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Helpers\PasswordHelper.cs" />
-    <Compile Include="Models\SharePointManager.cs" />
+    <Compile Include="Helpers\SharePointManager.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
@@ -206,13 +206,14 @@
     <Compile Include="Helpers\PagingHelpers.cs" />
     <Compile Include="Models\ApplicationContext.cs" />
     <Compile Include="Models\Document.cs" />
-    <Compile Include="Models\IdentityExtensions.cs" />
+    <Compile Include="Services\Concrete\IdentityExtensions.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PageInfo.cs" />
     <Compile Include="Models\PagesViewModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\Role.cs" />
-    <Compile Include="Models\SendEmail.cs" />
+    <Compile Include="Services\Abstract\ISendEmail.cs" />
+    <Compile Include="Services\Concrete\InboxMailRU.cs" />
     <Compile Include="Models\Sex.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

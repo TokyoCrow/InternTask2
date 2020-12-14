@@ -113,6 +113,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\SyncHepler.cs" />
     <Compile Include="Models\Document.cs" />
     <Compile Include="Models\DocumentContext.cs" />
     <Compile Include="Program.cs" />
@@ -122,6 +123,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Services\Concrete\DocumentComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

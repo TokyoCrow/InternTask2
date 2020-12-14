@@ -55,7 +55,7 @@ namespace InternTask2.Website.Helpers
                 {
                     clientContext.Credentials = Credentials;
                     Web web = clientContext.Web;
-                    FileCreationInformation newFile = new FileCreationInformation
+                    var newFile = new FileCreationInformation
                     {
                         Content = document.Content,
                         Url = document.Name
@@ -84,7 +84,7 @@ namespace InternTask2.Website.Helpers
                     clientContext.Credentials = Credentials;
                     Web web = clientContext.Web;
                     List users = web.Lists.GetByTitle(ListName);
-                    ListItemCreationInformation listItemCreationInformation = new ListItemCreationInformation();
+                    var listItemCreationInformation = new ListItemCreationInformation();
                     ListItem newUser = users.AddItem(listItemCreationInformation);
                     newUser["Name"] = user.Name;
                     newUser["Surname"] = user.Surname;
@@ -96,7 +96,7 @@ namespace InternTask2.Website.Helpers
                     newUser["Position"] = user.Position;
                     newUser["Country"] = user.Country;
                     newUser["City"] = user.City;
-                    newUser["IsApprove"] = user.IsApproved ? true:false;
+                    newUser["IsApprove"] = user.IsApproved;
                     
                     newUser.Update();
                     clientContext.Load(newUser);
@@ -198,9 +198,11 @@ namespace InternTask2.Website.Helpers
                     Web web = clientContext.Web;
                     if (!web.ListExist(clientContext, DocLibName))
                     {
-                        var createDL = new ListCreationInformation();
-                        createDL.Title = DocLibName;
-                        createDL.TemplateType = (int)ListTemplateType.DocumentLibrary;
+                        var createDL = new ListCreationInformation
+                        {
+                            Title = DocLibName,
+                            TemplateType = (int)ListTemplateType.DocumentLibrary
+                        };
                         web.Lists.Add(createDL);
                         clientContext.ExecuteQuery();
                     }
@@ -223,9 +225,11 @@ namespace InternTask2.Website.Helpers
                     Web web = clientContext.Web;
                     if (!web.ListExist(clientContext, ListName))
                     {
-                        ListCreationInformation listCreationInfo = new ListCreationInformation();
-                        listCreationInfo.Title = ListName;
-                        listCreationInfo.TemplateType = (int)ListTemplateType.GenericList;
+                        var listCreationInfo = new ListCreationInformation
+                        {
+                            Title = ListName,
+                            TemplateType = (int)ListTemplateType.GenericList
+                        };
 
                         List newList = web.Lists.Add(listCreationInfo);
 

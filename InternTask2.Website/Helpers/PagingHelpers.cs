@@ -9,11 +9,11 @@ namespace InternTask2.Website.Helpers
     {
         public static MvcHtmlString PageLinks(this HtmlHelper html, PageInfo pageInfo, Func<int, string> pageUrl)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             if (pageInfo.TotalPages > 1)
                 for (var i = 1; i <= pageInfo.TotalPages; i++)
                 {
-                    TagBuilder tag = new TagBuilder("a");
+                    var tag = new TagBuilder("a");
                     tag.MergeAttribute("href", pageUrl(i));
                     tag.InnerHtml = i.ToString();
                     if (i == pageInfo.PageNumber)

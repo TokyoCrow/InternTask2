@@ -23,8 +23,8 @@ namespace InternTask2.ConsoleApp.Helpers
             SiteUrl = Settings.Default.SPSiteUrl;
             DocumentLibName = Settings.Default.SPDocLibName;
             UserName = Settings.Default.SPLogin;
-            string Password = Settings.Default.SPPass;
-            SecureString securePassword = new SecureString();
+            var Password = Settings.Default.SPPass;
+            var securePassword = new SecureString();
             foreach (char c in Password) securePassword.AppendChar(c);
             credentials = new SharePointOnlineCredentials(UserName, securePassword);
         }
@@ -38,10 +38,10 @@ namespace InternTask2.ConsoleApp.Helpers
         private static IEnumerable<Document>  GetSPDocuments()
         {
             var documentsSP = new List<Document>();
-            using (ClientContext context = new ClientContext(SiteUrl))
+            using (var context = new ClientContext(SiteUrl))
             {
                 context.Credentials = credentials;
-                Web web = context.Web;
+                var web = context.Web;
 
                 FileCollection docLibSPFiles = web.Folders.GetByUrl(DocumentLibName).Files;
                 context.Load(docLibSPFiles);
@@ -52,7 +52,7 @@ namespace InternTask2.ConsoleApp.Helpers
                     var fileInfo = file.OpenBinaryStream();
                     context.ExecuteQuery();
                     byte[] content = null;
-                    using (BinaryReader br = new BinaryReader(fileInfo.Value))
+                    using (var br = new BinaryReader(fileInfo.Value))
                     {
                         content = br.ReadBytes((int)fileInfo.Value.Length);
                     }

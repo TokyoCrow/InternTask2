@@ -9,11 +9,11 @@ namespace InternTask2.Website.Helpers
     {
         public static MvcHtmlString ApproveRejectBtns(this HtmlHelper html, User user)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             if(!user.IsApproved)
             {
-                TagBuilder tagAApprove = new TagBuilder("a");
-                TagBuilder tagAReject = new TagBuilder("a");
+                var tagAApprove = new TagBuilder("a");
+                var tagAReject = new TagBuilder("a");
                 var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                 tagAApprove.MergeAttribute("href", urlHelper.Action("Approve","Admin", new { id = user.Id }));
                 tagAApprove.InnerHtml = "Approve";

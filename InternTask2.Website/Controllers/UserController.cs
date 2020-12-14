@@ -1,4 +1,5 @@
-﻿using InternTask2.Website.Models;
+﻿using InternTask2.Website.Helpers;
+using InternTask2.Website.Models;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
@@ -13,7 +14,7 @@ namespace InternTask2.Website.Controllers
     [Authorize(Roles = "user")]
     public class UserController : Controller
     {
-        private ApplicationContext db;
+        private readonly ApplicationContext db;
 
         public UserController()
         {
@@ -76,13 +77,13 @@ namespace InternTask2.Website.Controllers
                 .OrderBy(u => u.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
-            PageInfo pageInfo = new PageInfo
+            var pageInfo = new PageInfo
             {
                 PageNumber = page,
                 PageSize = pageSize,
                 TotalItems = db.Documents.Count()
             };
-            DocumentsViewModel dvm = new DocumentsViewModel { PageInfo = pageInfo, Documents = documentsPerPages };
+            var dvm = new DocumentsViewModel { PageInfo = pageInfo, Documents = documentsPerPages };
             return View(dvm);
         }
 

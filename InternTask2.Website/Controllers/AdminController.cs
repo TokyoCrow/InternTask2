@@ -1,5 +1,7 @@
 ﻿using InternTask2.Website.Helpers;
 using InternTask2.Website.Models;
+using InternTask2.Website.Services.Abstract;
+using InternTask2.Website.Services.Concrete;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -14,10 +16,12 @@ namespace InternTask2.Website.Controllers
     public class AdminController : Controller
     {
         private readonly ApplicationContext db;
+        private ISendEmail mail;
 
         public AdminController()
         {
             db = new ApplicationContext();
+            mail = new InboxMailRU();
         }
 
         public async Task<ActionResult> Approve(int id)
@@ -26,7 +30,6 @@ namespace InternTask2.Website.Controllers
             if (user == null)
                 return HttpNotFound();
 
-            ISendEmail mail = new InboxMailRU();
             string password = PasswordHelper.GetRandomPassword();
             if (await mail.Send($"Your password: {password}", user.Email, "You were approved!"))
             {
@@ -48,7 +51,6 @@ namespace InternTask2.Website.Controllers
             if (user == null)
                 return HttpNotFound();
 
-            ISendEmail mail = new InboxMailRU();
             string password = PasswordHelper.GetRandomPassword();
             if (await mail.Send($"Sorry.", user.Email, "You were rejected!"))
             {
@@ -71,13 +73,13 @@ namespace InternTask2.Website.Controllers
                 .OrderBy(u => u.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
-            PageInfo pageInfo = new PageInfo
+            var pageInfo = new PageInfo
             {
                 PageNumber = page,
                 PageSize = pageSize,
                 TotalItems = db.Users.Count()
             };
-            UsersViewModel uvm = new UsersViewModel { PageInfo = pageInfo, Users = userPerPages };
+            var uvm = new UsersViewModel { PageInfo = pageInfo, Users = userPerPages };
             return View(uvm);
         }
 
@@ -91,13 +93,13 @@ namespace InternTask2.Website.Controllers
                 .OrderBy(u => u.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
-            PageInfo pageInfo = new PageInfo
+            var pageInfo = new PageInfo
             {
                 PageNumber = page,
                 PageSize = pageSize,
                 TotalItems = db.Users.Count()
             };
-            UsersViewModel uvm = new UsersViewModel { PageInfo = pageInfo, Users = userPerPages };
+            var uvm = new UsersViewModel { PageInfo = pageInfo, Users = userPerPages };
             return View(uvm);
         }
 

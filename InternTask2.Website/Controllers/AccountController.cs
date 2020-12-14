@@ -24,8 +24,8 @@ namespace InternTask2.Website.Controllers
             db = new ApplicationContext();
         }
 
-        public ActionResult Login() 
-            =>  View();
+        public ActionResult Login()
+            => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -54,9 +54,9 @@ namespace InternTask2.Website.Controllers
 
         private void Authenticate(User user)
         {
-            ClaimsIdentity claim = new ClaimsIdentity("ApplicationCookie",
-                                                      ClaimsIdentity.DefaultNameClaimType,
-                                                      ClaimsIdentity.DefaultRoleClaimType);
+            var claim = new ClaimsIdentity("ApplicationCookie",
+                                           ClaimsIdentity.DefaultNameClaimType,
+                                           ClaimsIdentity.DefaultRoleClaimType);
 
             claim.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email, ClaimValueTypes.String));
             claim.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String));
@@ -66,9 +66,9 @@ namespace InternTask2.Website.Controllers
                                      "OWIN Provider",
                                      ClaimValueTypes.String));
 
-            ClaimsIdentity id = new ClaimsIdentity("ApplicationCookie",
-                                                   ClaimsIdentity.DefaultNameClaimType,
-                                                   ClaimsIdentity.DefaultRoleClaimType);
+            var id = new ClaimsIdentity("ApplicationCookie",
+                                        ClaimsIdentity.DefaultNameClaimType,
+                                        ClaimsIdentity.DefaultRoleClaimType);
             AuthenticationManager.SignOut();
             AuthenticationManager.SignIn(new AuthenticationProperties
             {
@@ -112,7 +112,7 @@ namespace InternTask2.Website.Controllers
                     if (userSex != null)
                         user.Sex = userSex;
                     user.SPId = SharePointManager.AddUserToCustomList(user);
-                    if(user.SPId > 0)
+                    if (user.SPId > 0)
                     {
                         db.Users.Add(user);
                         await db.SaveChangesAsync();
@@ -132,7 +132,7 @@ namespace InternTask2.Website.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        public ActionResult SuccessfulReg() 
+        public ActionResult SuccessfulReg()
             => View();
 
         protected override void Dispose(bool disposing)

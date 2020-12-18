@@ -1,5 +1,6 @@
 ﻿using InternTask2.Website.Helpers;
 using InternTask2.Website.Models;
+using InternTask2.Website.Services.Abstract;
 using Microsoft.Owin.Security;
 using System.Data.Entity;
 using System.Security.Claims;
@@ -12,6 +13,7 @@ namespace InternTask2.Website.Controllers
     public class AccountController : Controller
     {
         private readonly ApplicationContext db;
+        private ISharePointManager spManager;
         private IAuthenticationManager AuthenticationManager
         {
             get
@@ -19,9 +21,10 @@ namespace InternTask2.Website.Controllers
                 return HttpContext.GetOwinContext().Authentication;
             }
         }
-        public AccountController()
+        public AccountController(ISharePointManager _spManager)
         {
             db = new ApplicationContext();
+            spManager = _spManager;
         }
 
         public ActionResult Login()
@@ -111,7 +114,7 @@ namespace InternTask2.Website.Controllers
                     Sex userSex = await db.Sexes.FirstOrDefaultAsync(s => s.Id == model.SexId);
                     if (userSex != null)
                         user.Sex = userSex;
-                    user.SPId = SharePointManager.AddUserToCustomList(user);
+                    user.SPId = spManager.AddUserToCustomList(user);
                     if (user.SPId > 0)
                     {
                         db.Users.Add(user);
@@ -125,7 +128,7 @@ namespace InternTask2.Website.Controllers
             return View(model);
         }
 
-
+        [Authorize]
         public ActionResult Logout()
         {
             AuthenticationManager.SignOut();

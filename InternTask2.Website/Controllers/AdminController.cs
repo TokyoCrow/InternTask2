@@ -17,11 +17,13 @@ namespace InternTask2.Website.Controllers
     {
         private readonly ApplicationContext db;
         private ISendEmail mail;
+        private ISharePointManager spManager;
 
-        public AdminController()
+        public AdminController(ISendEmail _mail, ISharePointManager _spManager)
         {
             db = new ApplicationContext();
-            mail = new InboxMailRU();
+            mail = _mail;
+            spManager = _spManager;
         }
 
         public async Task<ActionResult> Approve(int id)
@@ -35,7 +37,7 @@ namespace InternTask2.Website.Controllers
             {
                 user.Password = PasswordHelper.GetHashedPassword(user.Email, password);
                 user.IsApproved = true;
-                SharePointManager.ApproveUser(user);
+                spManager.ApproveUser(user);
                 db.Entry(user).State = EntityState.Modified;
                 await db.SaveChangesAsync();
             }
@@ -54,7 +56,7 @@ namespace InternTask2.Website.Controllers
             string password = PasswordHelper.GetRandomPassword();
             if (await mail.Send($"Sorry.", user.Email, "You were rejected!"))
             {
-                SharePointManager.RejectUser(user);
+                spManager.RejectUser(user);
                 db.Users.Remove(user);
                 await db.SaveChangesAsync();
             }

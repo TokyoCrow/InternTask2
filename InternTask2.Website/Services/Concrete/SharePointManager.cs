@@ -1,22 +1,23 @@
 ﻿using InternTask2.Website.Models;
 using InternTask2.Website.Properties;
+using InternTask2.Website.Services.Abstract;
 using Microsoft.SharePoint.Client;
 using System;
 using System.Security;
 using User = InternTask2.Website.Models.User;
 
-namespace InternTask2.Website.Helpers
+namespace InternTask2.Website.Services.Concrete
 {
-    public static class SharePointManager
+    public class SharePointManager: ISharePointManager
     {
-        static readonly string SiteUrl;
-        static readonly string DocLibName;
-        static readonly string ListName;
-        static readonly string Login;
-        static readonly SecureString SecurePassword;
-        static readonly SharePointOnlineCredentials Credentials;
+        readonly string SiteUrl;
+        readonly string DocLibName;
+        readonly string ListName;
+        readonly string Login;
+        readonly SecureString SecurePassword;
+        readonly SharePointOnlineCredentials Credentials;
 
-        static SharePointManager()
+        public SharePointManager()
         {
             SiteUrl = Settings.Default.SPSiteUrl;
             DocLibName = Settings.Default.SPDocLibName;
@@ -26,13 +27,13 @@ namespace InternTask2.Website.Helpers
             foreach (char c in Settings.Default.SPPass) SecurePassword.AppendChar(c);
             Credentials = new SharePointOnlineCredentials(Login, SecurePassword);
         }
-        public static void CreateListNLibrary()
+        public void CreateListNLibrary()
         {
             CreateUsersList();
             CreateDocLibNamerary();
         }
 
-        static bool ListExist(this Web web, ClientContext clientContext, string listName)
+        bool ListExist(Web web, ClientContext clientContext, string listName)
         {
             try
             {
@@ -47,20 +48,20 @@ namespace InternTask2.Website.Helpers
             }
         }
 
-        public static DateTime AddNewDocument(Document document)
+        public DateTime AddNewDocument(Document document)
         {
             try
             {
                 using(var clientContext = new ClientContext(SiteUrl))
                 {
                     clientContext.Credentials = Credentials;
-                    Web web = clientContext.Web;
+                    var var = clientContext.Web;
                     var newFile = new FileCreationInformation
                     {
                         Content = document.Content,
                         Url = document.Name
                     };
-                    List docs = web.Lists.GetByTitle(DocLibName);
+                    List docs = var.Lists.GetByTitle(DocLibName);
                     File uFile = docs.RootFolder.Files.Add(newFile);
                     docs.Update();
                     clientContext.Load(docs);
@@ -75,15 +76,15 @@ namespace InternTask2.Website.Helpers
             return DateTime.UtcNow;
         }
 
-        public static int AddUserToCustomList(User user)
+        public int AddUserToCustomList(User user)
         {
             try
             {
                 using (var clientContext = new ClientContext(SiteUrl))
                 {
                     clientContext.Credentials = Credentials;
-                    Web web = clientContext.Web;
-                    List users = web.Lists.GetByTitle(ListName);
+                    var var = clientContext.Web;
+                    List users = var.Lists.GetByTitle(ListName);
                     var listItemCreationInformation = new ListItemCreationInformation();
                     ListItem newUser = users.AddItem(listItemCreationInformation);
                     newUser["Name"] = user.Name;
@@ -111,15 +112,15 @@ namespace InternTask2.Website.Helpers
             return 0;
         }
 
-        public static void ApproveUser(User user)
+        public void ApproveUser(User user)
         {
             try
             {
                 using (var clientContext = new ClientContext(SiteUrl))
                 {
                     clientContext.Credentials = Credentials;
-                    Web web = clientContext.Web;
-                    List users = web.Lists.GetByTitle(ListName);
+                    var var = clientContext.Web;
+                    List users = var.Lists.GetByTitle(ListName);
                     ListItem userItem = users.GetItemById(user.SPId);
                     userItem["IsApprove"] = true;
 
@@ -133,15 +134,15 @@ namespace InternTask2.Website.Helpers
             }
         }
         
-        public static void UpdateUser(User user)
+        public void UpdateUser(User user)
         {
             try
             {
                 using (var clientContext = new ClientContext(SiteUrl))
                 {
                     clientContext.Credentials = Credentials;
-                    Web web = clientContext.Web;
-                    List users = web.Lists.GetByTitle(ListName);
+                    var var = clientContext.Web;
+                    List users = var.Lists.GetByTitle(ListName);
                     ListItem userItem = users.GetItemById(user.SPId);
                     userItem["Name"] = user.Name;
                     userItem["Surname"] = user.Surname;
@@ -166,15 +167,15 @@ namespace InternTask2.Website.Helpers
             }
         }
 
-        public static void RejectUser(User user)
+        public void RejectUser(User user)
         {
             try
             {
                 using (var clientContext = new ClientContext(SiteUrl))
                 {
                     clientContext.Credentials = Credentials;
-                    Web web = clientContext.Web;
-                    List users = web.Lists.GetByTitle(ListName);
+                    var var = clientContext.Web;
+                    List users = var.Lists.GetByTitle(ListName);
                     ListItem userItem = users.GetItemById(user.SPId);
                     userItem.DeleteObject();
 
@@ -188,15 +189,15 @@ namespace InternTask2.Website.Helpers
             }
         }
 
-        private static void CreateDocLibNamerary()
+        private void CreateDocLibNamerary()
         {
             try
             {
                 using (var clientContext = new ClientContext(SiteUrl))
                 {
                     clientContext.Credentials = Credentials;
-                    Web web = clientContext.Web;
-                    if (!web.ListExist(clientContext, DocLibName))
+                    var web = clientContext.Web;
+                    if (!ListExist(web, clientContext, DocLibName))
                     {
                         var createDL = new ListCreationInformation
                         {
@@ -215,15 +216,15 @@ namespace InternTask2.Website.Helpers
             }
         }
 
-        private static void CreateUsersList()
+        private void CreateUsersList()
         {
             try
             {
                 using (var clientContext = new ClientContext(SiteUrl))
                 {
                     clientContext.Credentials = Credentials;
-                    Web web = clientContext.Web;
-                    if (!web.ListExist(clientContext, ListName))
+                    var web = clientContext.Web;
+                    if (!ListExist(web,clientContext, ListName))
                     {
                         var listCreationInfo = new ListCreationInformation
                         {

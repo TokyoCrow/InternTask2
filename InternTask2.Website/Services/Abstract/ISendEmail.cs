@@ -2,7 +2,7 @@
 
 namespace InternTask2.Website.Services.Abstract
 {
-    interface ISendEmail
+    public interface ISendEmail
     {
         Task<bool> Send(string mailText, string addressee, string subject);
     }

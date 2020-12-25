@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InternTask2.Core.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

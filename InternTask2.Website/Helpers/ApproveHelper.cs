@@ -7,7 +7,7 @@ namespace InternTask2.Website.Helpers
 {
     public  static class ApproveHelper
     {
-        public static MvcHtmlString ApproveRejectBtns(this HtmlHelper html, User user)
+        public static MvcHtmlString ApproveRejectBtns(this HtmlHelper html, UserView user)
         {
             var result = new StringBuilder();
             if(!user.IsApproved)

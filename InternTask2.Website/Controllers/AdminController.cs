@@ -1,13 +1,10 @@
-﻿using InternTask2.Website.Helpers;
+﻿using AutoMapper;
+using InternTask2.BLL.Models;
+using InternTask2.BLL.Services.Abstract;
 using InternTask2.Website.Models;
-using InternTask2.Website.Services.Abstract;
-using InternTask2.Website.Services.Concrete;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace InternTask2.Website.Controllers
@@ -15,53 +12,45 @@ namespace InternTask2.Website.Controllers
     [Authorize(Roles = "admin")]
     public class AdminController : Controller
     {
-        private readonly ApplicationContext db;
-        private ISendEmail mail;
-        private ISharePointManager spManager;
+        private readonly IAdminService db;
 
-        public AdminController(ISendEmail _mail, ISharePointManager _spManager)
+        public AdminController(IAdminService ias)
         {
-            db = new ApplicationContext();
-            mail = _mail;
-            spManager = _spManager;
+            db = ias;
         }
 
-        public async Task<ActionResult> Approve(int id)
+        public ActionResult Approve(int id)
         {
-            var user = await db.Users.FindAsync(id);
+            var user = db.GetUserById(id);
             if (user == null)
                 return HttpNotFound();
 
-            string password = PasswordHelper.GetRandomPassword();
-            if (await mail.Send($"Your password: {password}", user.Email, "You were approved!"))
+            try
             {
-                user.Password = PasswordHelper.GetHashedPassword(user.Email, password);
-                user.IsApproved = true;
-                spManager.ApproveUser(user);
-                db.Entry(user).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                db.SendApproveEmail(user);
             }
-            else
+            catch
+            {
                 return RedirectToAction("EmailSendingError");
+            }
 
             return RedirectToAction("NewRegistrations");
         }
 
-        public async Task<ActionResult> Reject(int id)
+        public ActionResult Reject(int id)
         {
-            var user = await db.Users.FindAsync(id); 
+            var user = db.GetUserById(id);
             if (user == null)
                 return HttpNotFound();
 
-            string password = PasswordHelper.GetRandomPassword();
-            if (await mail.Send($"Sorry.", user.Email, "You were rejected!"))
+            try
             {
-                spManager.RejectUser(user);
-                db.Users.Remove(user);
-                await db.SaveChangesAsync();
+                db.SendRejectEmail(user);
             }
-            else
+            catch
+            {
                 return RedirectToAction("EmailSendingError");
+            }
 
             return RedirectToAction("NewRegistrations");
         }
@@ -69,17 +58,13 @@ namespace InternTask2.Website.Controllers
         public ActionResult Registrations(int page = 1)
         {
             int pageSize = 15;
-            IEnumerable<User> userPerPages = db.Users
-                .Include(u => u.Role)
-                .Include(u => u.Sex)
-                .OrderBy(u => u.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize);
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, UserView>()).CreateMapper();
+            IEnumerable<UserView> userPerPages = mapper.Map<IEnumerable<UserDTO>, IEnumerable<UserView>>(db.GetPageUsers(page, pageSize));
             var pageInfo = new PageInfo
             {
                 PageNumber = page,
                 PageSize = pageSize,
-                TotalItems = db.Users.Count()
+                TotalItems = db.UsersCount()
             };
             var uvm = new UsersViewModel { PageInfo = pageInfo, Users = userPerPages };
             return View(uvm);
@@ -87,42 +72,35 @@ namespace InternTask2.Website.Controllers
 
         public ActionResult NewRegistrations(int page = 1)
         {
-            int pageSize = 15;
-            IEnumerable<User> userPerPages = db.Users
-                .Where(u => u.IsApproved == false)
-                .Include(u => u.Role)
-                .Include(u => u.Sex)
-                .OrderBy(u => u.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize);
+            int pageSize = 15; 
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, UserView>()).CreateMapper();
+            IEnumerable<UserView> userPerPages = mapper.Map<IEnumerable<UserDTO>, IEnumerable<UserView>>(db.GetUnChecktedPageUser(page, pageSize));
             var pageInfo = new PageInfo
             {
                 PageNumber = page,
                 PageSize = pageSize,
-                TotalItems = db.Users.Count()
+                TotalItems = db.UsersCount()
             };
             var uvm = new UsersViewModel { PageInfo = pageInfo, Users = userPerPages };
             return View(uvm);
         }
 
-        public async Task<ActionResult> EditRole(int? id)
+        public ActionResult EditRole(int? id)
         {
             if (id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
-            var user = await db.Users
-                .Include(u => u.Sex)
-                .FirstOrDefaultAsync(u => u.Id == id);
+            
+            var user = db.GetUserById((int)id);
             if (user == null)
-                return HttpNotFound(); 
+                return HttpNotFound();
 
-            ViewData["RoleId"] = new SelectList(db.Roles, "Id", "Name", user.RoleId);
+            ViewData["RoleId"] = new SelectList(db.GetAllRoles(), "Id", "Name", user.RoleId);
             return View(user);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditRole(int id, [Bind(Include = "Id,Name,Surname,Patronymic,Email,Password,BirthDate,RoleId,SexId,Workplace,Position,Country,City,IsApproved")] User user)
+        public ActionResult EditRole(int id, [Bind(Include = "Id,Name,Surname,Patronymic,Email,Password,BirthDate,RoleId,SexId,Workplace,Position,Country,City,IsApproved")] UserView user)
         {
             if (id != user.Id)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -131,43 +109,38 @@ namespace InternTask2.Website.Controllers
             {
                 try
                 {
-                    db.Entry(user).State = EntityState.Modified;
-                    await db.SaveChangesAsync();
+                    var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserView, UserDTO>()).CreateMapper();
+                    var userForEdit = mapper.Map<UserView, UserDTO>(user);;
+                    db.UpdateUserRole(userForEdit);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (!db.IsUserExists(user.Id))
                         return HttpNotFound();
                     else
                         throw;
                 }
                 return RedirectToAction(nameof(Registrations));
             }
-            ViewData["RoleId"] = new SelectList(db.Roles, "Id", "Name", user.RoleId);
+            ViewData["RoleId"] = new SelectList(db.GetAllRoles(), "Id", "Name", user.RoleId);
             return View(user);
         }
 
-        public async Task<ActionResult> Details(int? id)
+        public ActionResult Details(int? id)
         {
             if (id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
-            var user = await db.Users
-                .Include(u => u.Role)
-                .Include(u => u.Sex)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user =  db.GetUserById((int)id);
             if (user == null)
                 return HttpNotFound();
 
             return View(user);
         }
 
-        [NonAction]
-        private bool UserExists(int id) 
-            => db.Users.Any(e => e.Id == id);
-
         protected override void Dispose(bool disposing)
         {
+            db.Dispose();
             if (disposing)
                 db.Dispose();
             base.Dispose(disposing);

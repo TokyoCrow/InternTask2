@@ -1,5 +1,6 @@
-﻿using InternTask2.Website.Models;
-using InternTask2.Website.Services.Abstract;
+﻿using InternTask2.BLL;
+using InternTask2.BLL.Services.Abstract;
+using InternTask2.Website.Properties;
 using Ninject;
 using Ninject.Modules;
 using Ninject.Web.Mvc;
@@ -18,9 +19,17 @@ namespace InternTask2.Website
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            IKernel kernel = new StandardKernel(new AppNinjectModule());
-            ISharePointManager sharePointManager = kernel.Get<ISharePointManager>();
-            sharePointManager.CreateListNLibrary();
+            NinjectModule bllModule = new BLLNinjectModule(
+                "DefaultConnection",
+                Settings.Default.SPSiteUrl,
+                Settings.Default.SPDocLibName,
+                Settings.Default.SPListName,
+                Settings.Default.SPLogin,
+                Settings.Default.SPPass
+                );
+            IKernel kernel = new StandardKernel(new AppNinjectModule(), bllModule);
+            ISPService spInitializer = kernel.Get<ISPService>();
+            spInitializer.Initialize();
             DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
         }
     }

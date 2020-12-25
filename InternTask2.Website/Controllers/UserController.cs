@@ -1,11 +1,13 @@
-﻿using InternTask2.Website.Helpers;
+﻿using AutoMapper;
+using InternTask2.BLL.Models;
+using InternTask2.BLL.Services.Abstract;
+using InternTask2.BLL.Services.Concrete;
+using InternTask2.Core.Models;
 using InternTask2.Website.Models;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,11 +16,11 @@ namespace InternTask2.Website.Controllers
     [Authorize(Roles = "user")]
     public class UserController : Controller
     {
-        private readonly ApplicationContext db;
+        private readonly IUserService db;
 
-        public UserController()
+        public UserController(IUserService ius)
         {
-            db = new ApplicationContext();
+            db = ius;
         }
 
         public ActionResult Upload()
@@ -26,37 +28,30 @@ namespace InternTask2.Website.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Upload(HttpPostedFileBase upload)
+        public ActionResult Upload(HttpPostedFileBase upload)
         {
             if (ModelState.IsValid)
             {
-                string fileName = Path.GetFileName(upload.FileName);
-                Document document = await db.Documents.FirstOrDefaultAsync(doc => doc.Name == fileName);
-                if (document == null)
+                try
                 {
-                    byte[] content;
-                    using (var binaryReader = new BinaryReader(upload.InputStream))
-                        content = binaryReader.ReadBytes(upload.ContentLength);
-                    document = new Document
-                    {
-                        Content = content,
-                        Name = fileName
-                    };
-                    document.Modified = SharePointManager.AddNewDocument(document);
-                    db.Documents.Add(document);
-
-                    await db.SaveChangesAsync();
+                    db.UploadDocument(upload);
+                }
+                catch(ValidationException ex)
+                {
+                    ModelState.AddModelError(ex.Message, "");
                 }
                 return RedirectToAction(nameof(Index));
             }
             return View();
         }
 
-        public async Task<ActionResult> Download(int? id)
+        public ActionResult Download(int? id)
         {
             if (id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            Document document = await db.Documents.FirstOrDefaultAsync(doc => doc.Id == id);
+            
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<DocumentDTO, Document>()).CreateMapper();
+            var document = mapper.Map<DocumentDTO, Document>(db.GetDocumentById((int)id));
             string fileName = document.Name;
             string fileType = MimeMapping.GetMimeMapping(fileName);
             return File(document.Content, fileType, fileName);
@@ -64,7 +59,8 @@ namespace InternTask2.Website.Controllers
 
         public ActionResult IsDocumentNameUnique(string name)
         {
-            Document document = db.Documents.FirstOrDefault(doc => doc.Name == name);
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<DocumentDTO, Document>()).CreateMapper();
+            Document document = mapper.Map<DocumentDTO, Document>(db.GetDocumentByName(name));
             if (document != null)
                 return Json(false);
             return Json(true);
@@ -73,15 +69,14 @@ namespace InternTask2.Website.Controllers
         public ActionResult Index(int page = 1)
         {
             int pageSize = 15;
-            IEnumerable<Document> documentsPerPages = db.Documents
-                .OrderBy(u => u.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize);
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<DocumentDTO, DocumentView>()).CreateMapper();
+            IEnumerable<DocumentView> documentsPerPages = mapper.Map<IEnumerable<DocumentDTO>, IEnumerable<DocumentView>>(db.GetDocumentsPage(page, pageSize));
+
             var pageInfo = new PageInfo
             {
                 PageNumber = page,
                 PageSize = pageSize,
-                TotalItems = db.Documents.Count()
+                TotalItems = db.DocumentsCount()
             };
             var dvm = new DocumentsViewModel { PageInfo = pageInfo, Documents = documentsPerPages };
             return View(dvm);
@@ -90,6 +85,7 @@ namespace InternTask2.Website.Controllers
 
         protected override void Dispose(bool disposing)
         {
+            db.Dispose();
             if (disposing)
                 db.Dispose();
             base.Dispose(disposing);

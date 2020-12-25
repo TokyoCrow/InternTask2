@@ -1,5 +1,7 @@
-﻿using InternTask2.Website.Services.Abstract;
-using InternTask2.Website.Services.Concrete;
+﻿using InternTask2.BLL.Services.Abstract;
+using InternTask2.BLL.Services.Concrete;
+using InternTask2.Core.Services.Abstract;
+using InternTask2.Core.Services.Concrete;
 using Ninject.Modules;
 
 namespace InternTask2.Website
@@ -8,8 +10,11 @@ namespace InternTask2.Website
     {
         public override void Load()
         {
-            Bind<ISharePointManager>().To<SharePointManager>();
+            Bind<IAdminService>().To<AdminService>();
+            Bind<IAccountService>().To<AccountService>();
+            Bind<IUserService>().To<UserService>();
             Bind<ISendEmail>().To<InboxMailRU>();
+            Bind<ISPService>().To<SPService>();
         }
     }
 }

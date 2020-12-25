@@ -1,10 +1,11 @@
-﻿using InternTask2.Website.Helpers;
+﻿using AutoMapper;
+using InternTask2.BLL.Models;
+using InternTask2.BLL.Services.Abstract;
+using InternTask2.BLL.Services.Concrete;
+using InternTask2.Core.Models;
 using InternTask2.Website.Models;
-using InternTask2.Website.Services.Abstract;
 using Microsoft.Owin.Security;
-using System.Data.Entity;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -12,8 +13,7 @@ namespace InternTask2.Website.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ApplicationContext db;
-        private ISharePointManager spManager;
+        private readonly IAccountService db;
         private IAuthenticationManager AuthenticationManager
         {
             get
@@ -21,10 +21,9 @@ namespace InternTask2.Website.Controllers
                 return HttpContext.GetOwinContext().Authentication;
             }
         }
-        public AccountController(ISharePointManager _spManager)
+        public AccountController(IAccountService ias)
         {
-            db = new ApplicationContext();
-            spManager = _spManager;
+            db = ias;
         }
 
         public ActionResult Login()
@@ -32,14 +31,12 @@ namespace InternTask2.Website.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginModel model)
+        public ActionResult Login(LoginModel model)
         {
             if (ModelState.IsValid)
             {
-                string hashedPassword = PasswordHelper.GetHashedPassword(model.Email, model.Password);
-                User user = await db.Users
-                    .Include(u => u.Role)
-                    .FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == hashedPassword);
+                var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, User>()).CreateMapper();
+                var user = mapper.Map<UserDTO,User>(db.FindUser(model.Email, model.Password));
                 if (user != null)
                 {
                     Authenticate(user);
@@ -82,20 +79,19 @@ namespace InternTask2.Website.Controllers
         [HttpGet]
         public ActionResult Register()
         {
-            ViewData["SexId"] = new SelectList(db.Sexes, "Id", "Name");
+            ViewData["SexId"] = new SelectList(db.GetAllSexes(), "Id", "Name");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterModel model)
+        public ActionResult Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-                if (user == null)
+                try
                 {
-                    user = new User
+                    var user = new UserDTO
                     {
                         Name = model.Name,
                         Surname = model.Surname,
@@ -108,23 +104,15 @@ namespace InternTask2.Website.Controllers
                         Country = model.Country,
                         City = model.City
                     };
-                    Role userRole = await db.Roles.FirstOrDefaultAsync(r => r.Name == "user");
-                    if (userRole != null)
-                        user.Role = userRole;
-                    Sex userSex = await db.Sexes.FirstOrDefaultAsync(s => s.Id == model.SexId);
-                    if (userSex != null)
-                        user.Sex = userSex;
-                    user.SPId = spManager.AddUserToCustomList(user);
-                    if (user.SPId > 0)
-                    {
-                        db.Users.Add(user);
-                        await db.SaveChangesAsync();
-                        return RedirectToAction("SuccessfulReg", "Account");
-                    }
+                    db.Registration(user);
+                    return RedirectToAction("SuccessfulReg", "Account");
                 }
-                ModelState.AddModelError("", "Email already used");
+                catch(ValidationException ex) 
+                {
+                    ModelState.AddModelError(ex.Message, "");
+                }
             }
-            ViewData["SexId"] = new SelectList(db.Sexes, "Id", "Name");
+            ViewData["SexId"] = new SelectList(db.GetAllSexes(), "Id", "Name");
             return View(model);
         }
 
@@ -140,6 +128,7 @@ namespace InternTask2.Website.Controllers
 
         protected override void Dispose(bool disposing)
         {
+            db.Dispose();
             if (disposing)
                 db.Dispose();
             base.Dispose(disposing);

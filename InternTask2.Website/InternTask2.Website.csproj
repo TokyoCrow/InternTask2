@@ -46,6 +46,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -113,8 +116,8 @@
     <Reference Include="Microsoft.SharePoint.Client.WorkflowServices, Version=16.1.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SharePointOnline.CSOM.16.1.20616.12000\lib\net45\Microsoft.SharePoint.Client.WorkflowServices.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject, Version=3.3.3.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ninject.3.3.3\lib\net45\Ninject.dll</HintPath>
+    <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="Ninject.Web.Common, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.Web.Common.3.3.0\lib\net45\Ninject.Web.Common.dll</HintPath>
@@ -207,8 +210,6 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Helpers\PasswordHelper.cs" />
-    <Compile Include="Services\Abstract\ISharePointManager.cs" />
-    <Compile Include="Services\Concrete\SharePointManager.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
@@ -218,18 +219,13 @@
     </Compile>
     <Compile Include="Helpers\ApproveHelper.cs" />
     <Compile Include="Helpers\PagingHelpers.cs" />
-    <Compile Include="Models\ApplicationContext.cs" />
-    <Compile Include="Models\Document.cs" />
+    <Compile Include="Models\DocumentView.cs" />
     <Compile Include="Services\Concrete\IdentityExtensions.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PageInfo.cs" />
     <Compile Include="Models\PagesViewModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
-    <Compile Include="Models\Role.cs" />
-    <Compile Include="Services\Abstract\ISendEmail.cs" />
-    <Compile Include="Services\Concrete\InboxMailRU.cs" />
-    <Compile Include="Models\Sex.cs" />
-    <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -291,6 +287,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Services\Abstract\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -304,6 +301,16 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InternTask2.BLL\InternTask2.BLL.csproj">
+      <Project>{3D79C585-1F31-447D-B3F0-1620E485C6EB}</Project>
+      <Name>InternTask2.BLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InternTask2.Core\InternTask2.Core.csproj">
+      <Project>{E00C2592-CC5E-4545-86BD-0A1CF387C9C0}</Project>
+      <Name>InternTask2.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

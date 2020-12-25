@@ -28,6 +28,7 @@ namespace InternTask2.Website
                 Settings.Default.SPPass
                 );
             IKernel kernel = new StandardKernel(new AppNinjectModule(), bllModule);
+            kernel.Unbind<ModelValidatorProvider>();
             ISPService spInitializer = kernel.Get<ISPService>();
             spInitializer.Initialize();
             DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));

@@ -8,7 +8,7 @@ namespace InternTask2.Core.Services.Concrete
 
     public class InboxMailRU : ISendEmail
     {
-        public async Task<bool> Send(string mailText, string addressee, string subject)
+        public bool Send(string mailText, string addressee, string subject)
         {
             using (var smtp = new SmtpClient())
             using (var message = new MailMessage())
@@ -19,7 +19,7 @@ namespace InternTask2.Core.Services.Concrete
                 smtp.EnableSsl = true;
                 try
                 {
-                    await smtp.SendMailAsync(message);
+                    smtp.Send(message);
                 }
                 catch (Exception e)
                 {

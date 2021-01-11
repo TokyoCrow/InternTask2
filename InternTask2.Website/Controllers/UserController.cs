@@ -5,8 +5,6 @@ using InternTask2.BLL.Services.Concrete;
 using InternTask2.Core.Models;
 using InternTask2.Website.Models;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;

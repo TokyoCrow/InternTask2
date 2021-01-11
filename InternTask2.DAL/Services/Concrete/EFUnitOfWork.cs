@@ -2,8 +2,6 @@
 using InternTask2.DAL.Models;
 using InternTask2.DAL.Services.Abstract;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace InternTask2.DAL.Services.Concrete
 {

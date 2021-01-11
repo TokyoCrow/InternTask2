@@ -14,7 +14,7 @@ namespace InternTask2.BLL.Services.Concrete
         IUnitOfWork db;
         ISPManager spManager;
 
-        public AccountService(IUnitOfWork db,ISPManager spm)
+        public AccountService(IUnitOfWork db, ISPManager spm)
         {
             this.db = db;
             spManager = spm;
@@ -102,7 +102,7 @@ namespace InternTask2.BLL.Services.Concrete
                     db.Save();
                 }
                 else
-                    throw new ValidationException("Registration fall","");
+                    throw new ValidationException("Registration fall", "");
             }
             else
                 throw new ValidationException("Email already used", "");

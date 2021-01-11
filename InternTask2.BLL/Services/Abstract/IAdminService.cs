@@ -1,7 +1,6 @@
 ﻿using InternTask2.BLL.Models;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace InternTask2.BLL.Services.Abstract
 {

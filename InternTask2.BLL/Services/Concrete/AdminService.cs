@@ -45,7 +45,7 @@ namespace InternTask2.BLL.Services.Concrete
 
         public IEnumerable<UserDTO> GetUnChecktedPageUser(int page, int pageSize)
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO > ()).CreateMapper();
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
             return mapper.Map<IEnumerable<User>, List<UserDTO>>(
                 db.Users
                    .Find(u => u.IsApproved == false)
@@ -78,12 +78,12 @@ namespace InternTask2.BLL.Services.Concrete
 
         public bool IsUserExists(int id) => db.Users.Get(id) != null;
 
-        public async void SendApproveEmail(UserDTO user)
+        public void SendApproveEmail(UserDTO user)
         {
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, User>()).CreateMapper();
             string password = PasswordHelper.GetRandomPassword();
             var userForEdit = mapper.Map<UserDTO, User>(user);
-            if (await mail.Send($"Your password: {password}", userForEdit.Email, "You were approved!"))
+            if (mail.Send($"Your password: {password}", userForEdit.Email, "You were approved!"))
             {
                 user.Password = PasswordHelper.GetHashedPassword(userForEdit.Email, password);
                 user.IsApproved = true;
@@ -95,11 +95,11 @@ namespace InternTask2.BLL.Services.Concrete
                 throw new ValidationException("Email sending fall", "");
         }
 
-        public async void SendRejectEmail(UserDTO user)
+        public void SendRejectEmail(UserDTO user)
         {
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, User>()).CreateMapper();
             var userForEdit = mapper.Map<UserDTO, User>(user);
-            if (await mail.Send($"Sorry.", user.Email, "You were rejected!"))
+            if (mail.Send($"Sorry.", user.Email, "You were rejected!"))
             {
                 spManager.DeleteUser(user.SPId);
                 db.Users.Delete(user.Id);
